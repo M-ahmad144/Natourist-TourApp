@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const tourRouter = require('./routes/toursRoutes');
 const userRouter = require('./routes/usersRoutes');
 const app = express();
+app.use(express.static('./public'));
 
 //Middlewares
 
@@ -11,7 +12,11 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
-app.use(morgan('dev'));
+
+console.log(process.env.NODE_ENV);
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
 //Mounting the Routers
 app.use('/api/v1/tours', tourRouter);

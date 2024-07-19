@@ -3,12 +3,22 @@ const fs = require('fs');
 const tours = JSON.parse(fs.readFileSync('./dev-data/data/tours-simple.json'));
 
 exports.checkId = (req, res, next, val) => {
-  console.log(val);
+  // console.log(val);
   const id = parseInt(val, 10);
   if (id > tours.length) {
     return res.status(404).json({
       status: 'fail',
       message: 'Invalid ID',
+    });
+  }
+  next();
+};
+
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Missing name or price in request body',
     });
   }
   next();
