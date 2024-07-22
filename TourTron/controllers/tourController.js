@@ -3,7 +3,13 @@ const Tour = require('../models/tourModel');
 // Get all tours
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    //made the shallow copy - modify queryObj without affecting req.query
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((field) => delete queryObj[field]);
+
+    const query = Tour.find(queryObj);
+    const tours = await query;
     res.status(200).json({
       status: 'success',
       results: tours.length,
