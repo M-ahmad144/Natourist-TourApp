@@ -19,20 +19,35 @@ exports.getAllTours = async (req, res) => {
     // Build the query
     let query = Tour.find(JSON.parse(strQuery));
 
-    // Apply sorting
-    const sortBy = req.query.sort
-      ? // console.log(sortBy); //e.g:price ratingsAverage
-        req.query.sort.split(',').join(' ')
-      : '-createdAt';
-    query = query.sort(sortBy);
+    // _______________Apply sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
 
-    // Apply field limiting
+    // _______________ Apply field limiting
     const fields = req.query.fields
       ? req.query.fields.split(',').join(' ')
       : '-__v';
     query = query.select(fields);
 
-    // Execute query
+    // _______________Pagination
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 100;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+    if (req.query.page) {
+      const numTour = await Tour.countDocuments();
+      if (skip >= numTour) {
+        throw new Error('this page does not exist');
+      }
+    }
+
+    //  ________________Execute query
+    //because of chaining the methods  the query looks like this -> query.sort().select().skip().limit()
     const tours = await query;
 
     // Respond with the results
@@ -44,6 +59,9 @@ exports.getAllTours = async (req, res) => {
       },
     });
   } catch (err) {
+    // Log the error for debugging purposes
+    console.error(err);
+
     // Respond with error message
     res.status(400).json({
       status: 'fail',
