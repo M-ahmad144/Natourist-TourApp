@@ -2,8 +2,10 @@ const express = require('express');
 const tourControllers = require('../controllers/tourController');
 // Creating the Express Router instances for tours
 const router = express.Router();
-
 // tours routes
+router
+  .route('/top-5-cheap')
+  .get(tourControllers.aliasToptour, tourControllers.getAllTours);
 router
   .route('/')
   .get(tourControllers.getAllTours)
