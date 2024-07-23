@@ -3,13 +3,39 @@ const Tour = require('../models/tourModel');
 // Get all tours
 exports.getAllTours = async (req, res) => {
   try {
-    //made the shallow copy - modify queryObj without affecting req.query
+    // Make a shallow copy of req.query to modify without affecting the original
     const queryObj = { ...req.query };
+
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((field) => delete queryObj[field]);
 
-    const query = Tour.find(queryObj);
+    // Convert queryObj to a JSON string and replace query operators with MongoDB operators
+    let strQuery = JSON.stringify(queryObj);
+    strQuery = strQuery.replace(
+      /\b(gte|gt|lt|lte|in)\b/g,
+      (match) => `$${match}`,
+    );
+
+    // Build the query
+    let query = Tour.find(JSON.parse(strQuery));
+
+    // Apply sorting
+    const sortBy = req.query.sort
+      ? // console.log(sortBy); //e.g:price ratingsAverage
+        req.query.sort.split(',').join(' ')
+      : '-createdAt';
+    query = query.sort(sortBy);
+
+    // Apply field limiting
+    const fields = req.query.fields
+      ? req.query.fields.split(',').join(' ')
+      : '-__v';
+    query = query.select(fields);
+
+    // Execute query
     const tours = await query;
+
+    // Respond with the results
     res.status(200).json({
       status: 'success',
       results: tours.length,
@@ -18,6 +44,7 @@ exports.getAllTours = async (req, res) => {
       },
     });
   } catch (err) {
+    // Respond with error message
     res.status(400).json({
       status: 'fail',
       message: err.message,
