@@ -105,6 +105,7 @@ exports.deleteTour = async (req, res) => {
     });
   }
 };
+//get tour stats
 exports.getToursStats = async (req, res) => {
   try {
     const stats = await Tour.aggregate([
@@ -141,16 +142,48 @@ exports.getToursStats = async (req, res) => {
     });
   }
 };
-
+//get monthy plan
 exports.getMonthlyPlan = async (req, res) => {
   try {
     const year = req.params.year * 1;
-
     const plan = await Tour.aggregate([
       {
+        // The $unwind stage deconstructs the startDates array field,
+        // This means that if a tour has multiple start dates, each date will have its own document.
         $unwind: '$startDates',
       },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' },
+          numTours: { $sum: 1 },
+          tours: { $push: '$name' },
+        },
+      },
+      {
+        $addFields: { month: '$_id' },
+      },
+      {
+        //hide the _id field
+        $project: {
+          _id: 0,
+        },
+      },
+      {
+        $sort: { numTours: -1 },
+      },
+      {
+        $limit: 12,
+      },
     ]);
+
     res.status(200).json({
       status: 'success',
       data: {
