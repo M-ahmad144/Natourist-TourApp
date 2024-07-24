@@ -13,7 +13,6 @@ exports.aliasToptour = (req, res, next) => {
 // Get all tours
 exports.getAllTours = async (req, res) => {
   try {
-    // Initialize ApiFeatures with the query(Tour.find()) and query string
     const features = new ApiFeatures(Tour.find(), req.query)
       .filter() // Apply filtering: Tour.find({ price: { $gte: 500 } })
       .sort() // Apply sorting: Tour.find({ price: { $gte: 500 } }).sort('price')
@@ -101,6 +100,65 @@ exports.deleteTour = async (req, res) => {
     });
   } catch (err) {
     res.status(404).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
+};
+exports.getToursStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: {
+            $toUpper: '$difficulty',
+          },
+          numTours: { $sum: 1 },
+          numRatings: { $sum: '$ratingsQuantity' },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+      {
+        $sort: { avgPrice: 1 },
+      },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        stats,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
+};
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1;
+
+    const plan = await Tour.aggregate([
+      {
+        $unwind: '$startDates',
+      },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        plan,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
       status: 'fail',
       message: err.message,
     });
