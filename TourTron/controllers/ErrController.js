@@ -6,9 +6,16 @@ const handleCastErrorDB = (err) => {
 };
 
 const handleDuplicateFieldsDB = (err) => {
-  const value = err.errmsg && err.errmsg.match(/(["'])(\\?.)*?\1/);
-
+  const value = err.keyValue
+    ? Object.values(err.keyValue).join(', ')
+    : 'unknown';
   const msg = `Duplicate field value: ${value}. Please use another value!`;
+  return new AppErr(msg, 400);
+};
+
+const handleValidationErrorDB = (err) => {
+  let errors = Object.values(err.errors).map((val) => val.message);
+  const msg = `Invalid field value: ${errors.join('. ')}`;
   return new AppErr(msg, 400);
 };
 
@@ -17,21 +24,17 @@ const sendErrorDev = (err, res) => {
     status: err.status,
     error: err,
     message: err.message,
-    stack: err.stack, // Include the stack trace for debugging
+    stack: err.stack,
   });
 };
 
 const sendErrorProd = (err, res) => {
-  // Check if the error is operational (known and trusted error)
   if (err.isOperational) {
     return res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
     });
   } else {
-    // Log the error for internal tracking
-    console.error('ERROR:', err);
-    // Send a generic error message to the client
     return res.status(500).json({
       status: 'error',
       message: 'Something went wrong, please try again later.',
@@ -40,21 +43,16 @@ const sendErrorProd = (err, res) => {
 };
 
 module.exports = (err, req, res, next) => {
-  // Set default values for the error status code and status
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
-  // Determine the environment and send the appropriate error response
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
-    let error = Object.assign({}, err); // Use Object.assign to properly copy error properties
-    if (error.name === 'CastError') {
-      error = handleCastErrorDB(error);
-    }
-    if (error.code === 11000) {
-      error = handleDuplicateFieldsDB(error);
-    }
+    let error = Object.assign({}, err);
+    if (error.name === 'CastError') error = handleCastErrorDB(err);
+    if (error.code === 11000) error = handleDuplicateFieldsDB(err);
+    if (error.name === 'ValidationError') error = handleValidationErrorDB(err);
     sendErrorProd(error, res);
   }
 };
