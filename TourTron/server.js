@@ -5,8 +5,15 @@ process.on('uncaughtException', (err) => {
   console.log('Uncaught Exception:');
   console.error(err.name, err.message);
 
+  // Extracting file and line number from stack trace
+  const stackLines = err.stack.split('\n');
+  if (stackLines.length > 1) {
+    console.error(stackLines[1].trim());
+  }
+
   process.exit(1);
 });
+
 // Load environment variables from .env file
 dotenv.config({ path: './config.env' });
 
