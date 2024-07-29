@@ -33,6 +33,8 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords do not match',
     },
   },
+
+  passwordChangedAt: Date,
 });
 
 //Hashing on the password
@@ -52,6 +54,24 @@ userSchema.methods.correctPassword = async function (
   password,
 ) {
   return await bcrypt.compare(candidatePassword, password);
+};
+
+// Method to check if the password was changed after a specific timestamp
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  // Check if passwordChangedAt is defined
+  if (this.passwordChangedAt) {
+    // Convert the passwordChangedAt date to a timestamp
+    const passwordChangedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000, // Convert to seconds
+      10,
+    );
+
+    // Compare the JWT timestamp with the passwordChanged timestamp
+    return JWTTimestamp < passwordChangedTimestamp;
+  }
+
+  // If passwordChangedAt is not set, return false
+  return false;
 };
 const User = mongoose.model('User', userSchema);
 
