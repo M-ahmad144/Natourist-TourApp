@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
@@ -38,15 +39,17 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords do not match',
     },
   },
-
+  passwordResetToken: String,
+  passwordResetExpires: Date,
   passwordChangedAt: Date,
 });
 
 //Hashing on the password
 
 //The pre('save') middleware specifically runs before a document is saved to the database.
+//pre-save middleware that hashes the user's password before saving the user document to the database
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')) return next(); //This checks if the password field has been modified
   this.password = await bcrypt.hash(this.password, 12);
   //there is no need to store passwordConfirm in the database. Storing it would be redundant and could pose a security risk
   this.passwordConfirm = undefined;
@@ -78,6 +81,31 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   // If passwordChangedAt is not set, return false
   return false;
 };
+
+//generate random token
+userSchema.methods.createPasswordResetToken = function () {
+  // Generate a unique token for password reset that will be sent to the user via email
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  // Store the hashed version of the password reset token in the database
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  console.log(
+    'passwordResetToken :' +
+      this.passwordResetToken +
+      '  ' +
+      'reset token :' +
+      resetToken,
+  );
+  // Set the password reset token to expire in 5 minutes
+  this.passwordResetExpires = Date.now() + 5 * 60 * 1000;
+
+  return resetToken;
+};
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
