@@ -54,6 +54,12 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  this.passwordChangedAt = new Date(Date.now() - 1000); // 1 sec ago
+  next();
+});
+
 // Method to compare the hashed password with the provided password
 userSchema.methods.correctPassword = async function (
   candidatePassword,
