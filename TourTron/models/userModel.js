@@ -44,19 +44,17 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
 });
 
-//Hashing on the password
-
-//The pre('save') middleware specifically runs before a document is saved to the database.
 //pre-save middleware that hashes the user's password before saving the user document to the database
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next(); //This checks if the password field has been modified
+  if (!this.isModified('password')) return next(); //This checks if the password field has not been modified
   this.password = await bcrypt.hash(this.password, 12);
-  //there is no need to store passwordConfirm in the database. Storing it would be redundant and could pose a security risk
+  //there is no need to store passwordConfirm in the database.
+  //Storing it would be redundant and could pose a security risk
   this.passwordConfirm = undefined;
   next();
 });
 
-//this method is instance method - therefore it will be available all user documents
+// Method to compare the hashed password with the provided password
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   password,
@@ -93,13 +91,6 @@ userSchema.methods.createPasswordResetToken = function () {
     .update(resetToken)
     .digest('hex');
 
-  console.log(
-    'passwordResetToken :' +
-      this.passwordResetToken +
-      '  ' +
-      'reset token :' +
-      resetToken,
-  );
   // Set the password reset token to expire in 5 minutes
   this.passwordResetExpires = Date.now() + 5 * 60 * 1000;
 
