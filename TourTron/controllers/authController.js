@@ -34,7 +34,6 @@ exports.signUp = catchAsync(async (req, res, next) => {
   });
 
   createSendToken(newUser, 201, res);
-  next();
 });
 
 //sign In User
@@ -47,6 +46,7 @@ exports.signIn = catchAsync(async (req, res, next) => {
   }
 
   // Find user by email and select password field
+  //const user = await User.findOne({ email: email, password: password }).select("+password");
   const user = await User.findOne({ email }).select('+password');
 
   // Check if user exists and password is correct
@@ -143,7 +143,7 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
       message: 'Reset password email sent. Please check your inbox.',
     });
   } catch (error) {
-    console.error('Error sending email:', error);
+    // console.error('Error sending email:', error);
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });

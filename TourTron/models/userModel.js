@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+
+// Define the user schema
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -9,100 +11,96 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'Please enter a  email address'],
+    required: [true, 'Please enter an email address'],
     unique: true,
     lowercase: true,
     validate: [validator.isEmail, 'Please enter a valid email'],
   },
-  photo: {
-    type: String,
-  },
+  photo: String,
   role: {
     type: String,
-    enum: ['user', 'guide', 'leade-guide', 'admin'],
+    enum: ['user', 'guide', 'lead-guide', 'admin'],
     default: 'user',
   },
   password: {
     type: String,
     required: [true, 'Please provide a password'],
     minlength: 8,
-    select: false, // Ensure password is not returned in queries
+    select: false,
   },
   passwordConfirm: {
     type: String,
     required: [true, 'Please confirm your password'],
     validate: {
-      //value point to the confirmPassword Value
+      // This only works on SAVE and CREATE!!!
       validator: function (value) {
-        return this.password === value;
+        return value === this.password;
       },
       message: 'Passwords do not match',
     },
+  },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
   },
   passwordResetToken: String,
   passwordResetExpires: Date,
   passwordChangedAt: Date,
 });
 
-//pre-save middleware that hashes the user's password before saving the user document to the database
+// Pre-save middleware to hash the password before saving the user document
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next(); //This checks if the password field has not been modified
+  if (!this.isModified('password')) return next();
+
   this.password = await bcrypt.hash(this.password, 12);
-  //there is no need to store passwordConfirm in the database.
-  //Storing it would be redundant and could pose a security risk
   this.passwordConfirm = undefined;
   next();
 });
 
+// Pre-save middleware to set the passwordChangedAt property
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
-  this.passwordChangedAt = new Date(Date.now() - 1000); // 1 sec ago
+
+  this.passwordChangedAt = Date.now() - 1000; // 1 sec in the past to ensure token issuance is after this change
   next();
 });
 
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
+  next();
+});
 // Method to compare the hashed password with the provided password
 userSchema.methods.correctPassword = async function (
   candidatePassword,
-  password,
+  userPassword,
 ) {
-  return await bcrypt.compare(candidatePassword, password);
+  return bcrypt.compare(candidatePassword, userPassword);
 };
 
 // Method to check if the password was changed after a specific timestamp
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
-  // Check if passwordChangedAt is defined
   if (this.passwordChangedAt) {
-    // Convert the passwordChangedAt date to a timestamp
     const passwordChangedTimestamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000, // Convert to seconds
+      this.passwordChangedAt.getTime() / 1000,
       10,
     );
-
-    // Compare the JWT timestamp with the passwordChanged timestamp
     return JWTTimestamp < passwordChangedTimestamp;
   }
-
-  // If passwordChangedAt is not set, return false
   return false;
 };
 
-//generate random token
+// Method to generate a random token for password reset
 userSchema.methods.createPasswordResetToken = function () {
-  // Generate a unique token for password reset that will be sent to the user via email
   const resetToken = crypto.randomBytes(32).toString('hex');
-
-  // Store the hashed version of the password reset token in the database
   this.passwordResetToken = crypto
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
-
-  // Set the password reset token to expire in 5 minutes
-  this.passwordResetExpires = Date.now() + 5 * 60 * 1000;
-
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // Token valid for 10 minutes
   return resetToken;
 };
 
+// Create and export the User model
 const User = mongoose.model('User', userSchema);
-
 module.exports = User;

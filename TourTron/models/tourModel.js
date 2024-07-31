@@ -105,26 +105,14 @@ tourSchema.pre('save', function (next) {
   next();
 });
 
-// //runs after the pre middle has finished
-// tourSchema.post('save', function (doc, next) {
-//   console.log(`New tour created: ${doc.name}`);
-//   next();
-// })
-
 //___________________________Query Middleware________________________
 
-//Query middleware : runs before executing the query
 //regular expression :matches the all query start with find
 tourSchema.pre(/^find/, function (next) {
   //get tours that not secrete
   this.find({ secretTour: { $ne: true } }); //this points to the currently processed query
   next();
 });
-
-// tourSchema.post(/^find/, function (docs, next) {
-//   console.log(docs);
-//   next();
-// })
 
 //___________________________Aggregation Pipeline________________________
 //remove secret tour also from aggregation pipeLine

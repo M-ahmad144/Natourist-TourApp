@@ -27,9 +27,8 @@ exports.updateUser = (req, res) => {
     message: 'This route is not yet implemented',
   });
 };
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet implemented',
-  });
-};
+exports.deleteUser = catchAsync(async (req, res, next) => {
+  //req.user comes from the protected middleware
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+  res.status(204).json({ status: 'success', data: null });
+});
