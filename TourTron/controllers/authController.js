@@ -13,7 +13,28 @@ const signToken = (id) => {
 };
 
 const createSendToken = (user, statusCode, res) => {
+  // 1. Generate a JWT token for the user
   const token = signToken(user._id);
+
+  // 2. Define options for the cookie
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+      // Sets cookie expiration based on environment variable (days to milliseconds)
+    ),
+    httpOnly: true, // Ensures the cookie is only accessible via HTTP(S) and not by JavaScript in the browser
+  };
+
+  // 3. If in production, set the cookie to be secure (only sent over HTTPS)
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+  // 4. Send the token in a cookie with the name 'jwt'
+  res.cookie('jwt', token, cookieOptions);
+
+  // Remove password from output
+  user.password = undefined;
+
+  // 5. Send a JSON response to the client with the status code, token, and user data
   res.status(statusCode).json({
     status: 'success',
     token,
@@ -46,7 +67,6 @@ exports.signIn = catchAsync(async (req, res, next) => {
   }
 
   // Find user by email and select password field
-  //const user = await User.findOne({ email: email, password: password }).select("+password");
   const user = await User.findOne({ email }).select('+password');
 
   // Check if user exists and password is correct
