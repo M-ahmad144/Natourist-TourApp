@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp');
 const rateLimit = require('express-rate-limit');
 const tourRouter = require('./routes/toursRoutes');
 const userRouter = require('./routes/usersRoutes');
@@ -27,6 +28,20 @@ app.use(mongoSanitize());
 
 //Data Sanitization against XSS (malachous HTML code)
 app.use(xss());
+
+// Prevent parameter pollution
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  }),
+);
 
 // Add request time to the request object
 app.use((req, res, next) => {
