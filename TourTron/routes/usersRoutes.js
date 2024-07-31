@@ -12,7 +12,7 @@ router.patch(
   authController.protect,
   authController.updatePassword,
 );
-router.delete('/deleteMe', authController.protect, userControllers.deleteUser);
+router.delete('/deleteMe', authController.protect, userControllers.deleteMe);
 
 router
   .route('/')

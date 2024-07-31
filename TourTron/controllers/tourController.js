@@ -9,16 +9,18 @@ exports.aliasToptour = (req, res, next) => {
   req.query.sort = '-ratingsAverage price';
   req.query.fields = 'name price ratingsAverage summary difficulty';
   next();
-  // console.log(req.query);
+  console.log(req.query.sort);
 };
 
 // Get all tours
 exports.getAllTours = catchAsync(async (req, res, next) => {
+  // example:GET /api/v1/tours?price[gte]=500&sort=-ratingsAverage,price&fields=name,duration,price&page=2&limit=10
+
   const features = new ApiFeatures(Tour.find(), req.query)
     .filter() // Apply filtering: Tour.find({ price: { $gte: 500 } })
-    .sort() // Apply sorting: Tour.find({ price: { $gte: 500 } }).sort('price')
-    .limitFields() // Apply field limiting: Tour.find({ price: { $gte: 500 } }).sort('price').select('name duration difficulty')
-    .paginate(); // Apply pagination: Tour.find({ price: { $gte: 500 } }).sort('price').select('name duration difficulty').skip(10).limit(10)
+    .sort() // Apply sorting: Tour.find({ price: { $gte: 500 } }).sort('-ratingsAverage price')
+    .limitFields() // Apply field limiting: Tour.find({ price: { $gte: 500 } }).sort('-ratingsAverage price').select('name duration difficulty')
+    .paginate(); // Apply pagination: Tour.find({ price: { $gte: 500 } }).sort('-ratingsAverage price').select('name duration difficulty').skip(10).limit(10)
 
   // Execute the query
   const tours = await features.query;
