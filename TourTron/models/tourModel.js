@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
+const User = require('./userModel');
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -86,7 +87,35 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      //GeoJson
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+
+    guides: Array,
   },
+
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -102,6 +131,17 @@ tourSchema.virtual('durationWeek').get(function () {
 //right before the data we actually save data into the database
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true }); //this points to the currently processed document
+  next();
+});
+
+//Embedding the guides documents in the tour model document
+tourSchema.pre('save', async function (next) {
+  //guides:Array conatins the id of the guides
+
+  //retrive all the guides that matches the id
+  const guidesPrmises = this.guides.map(async (id) => await User.findById(id)); //return the array of promises for each guide id
+
+  this.guides = await Promise.all(guidesPrmises);
   next();
 });
 

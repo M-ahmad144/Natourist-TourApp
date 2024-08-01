@@ -14,9 +14,7 @@ const connectionString = `mongodb+srv://${DATABASE_USERNAME}:${DATABASE_PASSWORD
 mongoose.connect(connectionString);
 
 //read the json file
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf8'),
-);
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
 
 //Import data into DB
 const importData = async () => {
@@ -24,7 +22,7 @@ const importData = async () => {
     await Tour.create(tours);
     console.log('Data imported successfully');
   } catch (e) {
-    console.error('Error importing data', e);
+    console.log('Error importing data', e);
   }
   process.exit();
 };
@@ -36,7 +34,7 @@ const deleteData = async () => {
     await Tour.deleteMany();
     console.log('Data deleted successfully');
   } catch (e) {
-    console.error('Error deleting data', e);
+    console.log('Error deleting data');
     process.exit();
   }
   process.exit();
