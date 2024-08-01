@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
-const User = require('./userModel');
+// const User = require('./userModel');
+const validateName = (value) => /^[A-Za-z\s]+$/.test(value);
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -17,7 +18,11 @@ const tourSchema = new mongoose.Schema(
         10,
         'A tour must have a name length eqaul or greater than 10 characters',
       ],
-      validate: [validator.isAlpha, 'A tour must only contains characters'],
+      validate: {
+        validator: validateName,
+        message:
+          'A tour name must only contain alphabetic characters and spaces',
+      },
     },
     slug: String,
 
@@ -113,7 +118,17 @@ const tourSchema = new mongoose.Schema(
       },
     ],
 
-    guides: Array,
+    // The guides field in the tourSchema is used to reference an array of user documents.
+    // The purpose of this field is to create a relationship between the Tour and User models.
+    // This allows you to link each tour to one or more guides (users) who are associated with that tour.
+    guides: [
+      // This field is an array, meaning each tour can have multiple guides.
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User', // This establishes a reference to another model named User.
+        // By setting ref to 'User', you indicate that each ObjectId in the guides array corresponds to a document in the User collection.
+      },
+    ],
   },
 
   {
@@ -135,19 +150,20 @@ tourSchema.pre('save', function (next) {
 });
 
 //Embedding the guides documents in the tour model document
-tourSchema.pre('save', async function (next) {
-  //guides:Array conatins the id of the guides
+// tourSchema.pre('save', async function (next) {
+// //guides:Array conatins the id of the guides
 
-  //retrive all the guides that matches the id
-  const guidesPrmises = this.guides.map(async (id) => await User.findById(id)); //return the array of promises for each guide id
+//   //retrive all the guides that matches the id
+//   const guidesPrmises = this.guides.map(async (id) => await User.findById(id)); //return the array of promises for each guide id
 
-  this.guides = await Promise.all(guidesPrmises);
-  next();
-});
+//   this.guides = await Promise.all(guidesPrmises);
+//   next();
+// });
 
 //___________________________Query Middleware________________________
 
 //regular expression :matches the all query start with find
+
 tourSchema.pre(/^find/, function (next) {
   //get tours that not secrete
   this.find({ secretTour: { $ne: true } }); //this points to the currently processed query
@@ -162,6 +178,7 @@ tourSchema.pre('aggregate', function (next) {
   // console.log(this.pipeline()); //this points to the currently processed aggregate funtion
   next();
 });
+
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;
