@@ -35,12 +35,10 @@ const reviewSchema = new mongoose.Schema(
 // Middleware to automatically populate tour and user fields
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'tour',
-    select: 'name',
-  }).populate({
     path: 'user',
     select: 'name photo',
   });
+
   next();
 });
 

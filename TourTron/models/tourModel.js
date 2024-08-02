@@ -121,8 +121,16 @@ const tourSchema = new mongoose.Schema(
   },
 );
 
+// Virtual Property: does not store data in the database
 tourSchema.virtual('durationWeek').get(function () {
   return this.duration / 7;
+});
+
+// Virtual populate the reviews for each tour
+tourSchema.virtual('reviews', {
+  ref: 'Review', // Reference to the Review model
+  foreignField: 'tour', // The name of the field in the Review model which is called "tour"
+  localField: '_id', // The _id in the local model (Tour) which is referenced as "tour" in the foreign model (Review)
 });
 
 //.............Query Middleware:
