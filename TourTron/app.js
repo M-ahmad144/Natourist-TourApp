@@ -8,6 +8,7 @@ const hpp = require('hpp');
 const rateLimit = require('express-rate-limit');
 const tourRouter = require('./routes/toursRoutes');
 const userRouter = require('./routes/usersRoutes');
+const reviewRouter = require('./routes/reviewsRoutes');
 const globalErrorHandler = require('./controllers/ErrController');
 
 const app = express();
@@ -60,11 +61,13 @@ const limiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour window
   message: 'Too many requests from this IP, please try again in an hour',
 });
+
 app.use('/api', limiter); // Apply to all routes starting with /api
 
 // Mounting Routers
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // Handle undefined routes
 app.all('*', (req, res, next) => {
