@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const validator = require('validator');
-// const User = require('./userModel');
+
+// Helper function to validate the tour name
 const validateName = (value) => /^[A-Za-z\s]+$/.test(value);
+
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -10,14 +11,8 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour must have a name'],
       trim: true,
       unique: true,
-      maxlength: [
-        50,
-        'A tour must have a name length less or equal than 50 characters',
-      ],
-      minlength: [
-        10,
-        'A tour must have a name length eqaul or greater than 10 characters',
-      ],
+      maxlength: [50, 'A tour name must be less or equal to 50 characters'],
+      minlength: [10, 'A tour name must be at least 10 characters'],
       validate: {
         validator: validateName,
         message:
@@ -25,7 +20,6 @@ const tourSchema = new mongoose.Schema(
       },
     },
     slug: String,
-
     duration: {
       type: Number,
       required: [true, 'A tour must have a duration'],
@@ -42,7 +36,6 @@ const tourSchema = new mongoose.Schema(
         message: 'Difficulty must be either easy, medium, or hard',
       },
     },
-
     ratingsAverage: {
       type: Number,
       default: 4.5,
@@ -53,7 +46,6 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-
     price: {
       type: Number,
       required: [true, 'A tour must have a price'],
@@ -61,7 +53,6 @@ const tourSchema = new mongoose.Schema(
     priceDiscount: {
       type: Number,
       validate: {
-        //this validator runs on the current doc on new tour create
         validator: function (value) {
           return value < this.price;
         },
@@ -71,7 +62,7 @@ const tourSchema = new mongoose.Schema(
     summary: {
       type: String,
       trim: true,
-      required: [true, ' A tour must have a summary'],
+      required: [true, 'A tour must have a summary'],
     },
     description: {
       type: String,
@@ -93,7 +84,7 @@ const tourSchema = new mongoose.Schema(
       default: false,
     },
     startLocation: {
-      //GeoJson
+      // GeoJSON
       type: {
         type: String,
         default: 'Point',
@@ -103,7 +94,6 @@ const tourSchema = new mongoose.Schema(
       address: String,
       description: String,
     },
-
     locations: [
       {
         type: {
@@ -117,20 +107,14 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-
-    // The guides field in the tourSchema is used to reference an array of user documents.
-    // The purpose of this field is to create a relationship between the Tour and User models.
-    // This allows you to link each tour to one or more guides (users) who are associated with that tour.
+    // Referencing/Normalization the user (guides) in the tour model
     guides: [
-      // This field is an array, meaning each tour can have multiple guides.
       {
         type: mongoose.Schema.ObjectId,
-        ref: 'User', // This establishes a reference to another model named User.
-        // By setting ref to 'User', you indicate that each ObjectId in the guides array corresponds to a document in the User collection.
+        ref: 'User',
       },
     ],
   },
-
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -141,41 +125,30 @@ tourSchema.virtual('durationWeek').get(function () {
   return this.duration / 7;
 });
 
-//___________________________Document Middleware________________________
-//Documnet middleware : runs before .save() and .create()
-//right before the data we actually save data into the database
+//.............Query Middleware:
+//  runs before any save query
 tourSchema.pre('save', function (next) {
-  this.slug = slugify(this.name, { lower: true }); //this points to the currently processed document
+  this.slug = slugify(this.name, { lower: true });
   next();
 });
 
-//Embedding the guides documents in the tour model document
-// tourSchema.pre('save', async function (next) {
-// //guides:Array conatins the id of the guides
-
-//   //retrive all the guides that matches the id
-//   const guidesPrmises = this.guides.map(async (id) => await User.findById(id)); //return the array of promises for each guide id
-
-//   this.guides = await Promise.all(guidesPrmises);
-//   next();
-// });
-
-//___________________________Query Middleware________________________
-
-//regular expression :matches the all query start with find
+//  runs before any find query
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
+  next();
+});
 
 tourSchema.pre(/^find/, function (next) {
-  //get tours that not secrete
-  this.find({ secretTour: { $ne: true } }); //this points to the currently processed query
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
   next();
 });
 
-//___________________________Aggregation Pipeline________________________
-//remove secret tour also from aggregation pipeLine
+// Aggregation Middleware: runs before any aggregate query
 tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-
-  // console.log(this.pipeline()); //this points to the currently processed aggregate funtion
   next();
 });
 

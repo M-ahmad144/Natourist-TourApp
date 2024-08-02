@@ -15,7 +15,6 @@ exports.aliasToptour = (req, res, next) => {
 // Get all tours
 exports.getAllTours = catchAsync(async (req, res, next) => {
   // example:GET /api/v1/tours?price[gte]=500&sort=-ratingsAverage,price&fields=name,duration,price&page=2&limit=10
-
   const features = new ApiFeatures(Tour.find(), req.query)
     .filter() // Apply filtering: Tour.find({ price: { $gte: 500 } })
     .sort() // Apply sorting: Tour.find({ price: { $gte: 500 } }).sort('-ratingsAverage price')
@@ -35,6 +34,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 // Get a single tour
 exports.getTour = catchAsync(async (req, res, next) => {
+  //populate('guides') -popuate the guides data in the get tour
   const tour = await Tour.findById(req.params.id);
   if (!tour) {
     return next(new AppErr('No tour found with that ID', 404));
