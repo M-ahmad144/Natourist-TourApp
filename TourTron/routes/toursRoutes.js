@@ -1,9 +1,14 @@
 const express = require('express');
 const tourControllers = require('../controllers/tourController');
 const authControllers = require('../controllers/authController');
+const reviewRouter = require('../routes/reviewsRoutes');
 
 // Creating the Express Router instances for tours
 const router = express.Router();
+
+// The router itself is a middleware, so for this specific route, we use the review router defined in reviewRoutes.
+router.use('/:tourId/reviews', reviewRouter);
+
 // tours routes
 router
   .route('/top-5-cheap')
