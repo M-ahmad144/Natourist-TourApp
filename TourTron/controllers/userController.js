@@ -12,7 +12,8 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-// Middleware in the userRouter to set req.params.id to the current user's ID so we dont have to pass it in the url every time
+// Middleware in the userRouter to set req.params.id to the current user's ID
+// so we don't have to pass it in the URL every time
 exports.getMe = (req, res, next) => {
   req.params.id = req.user.id;
   next();
@@ -20,7 +21,7 @@ exports.getMe = (req, res, next) => {
 
 // Update the current user's details (name, email, etc.)
 exports.updateMe = catchAsync(async (req, res, next) => {
-  // 1) Create error if user POSTs password data
+  // 1) Create an error if user POSTs password data
   if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppError(
@@ -71,7 +72,7 @@ exports.getUser = factory.getDocument(User);
 // Get all users
 exports.getAllUsers = factory.getAllDocuments(User);
 
-// Update an existing user by ID
+// Update a user for admin - Do not update password with this
 exports.updateUser = factory.updateDocument(User);
 
 // Delete a user by ID
