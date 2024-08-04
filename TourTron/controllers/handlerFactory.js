@@ -44,7 +44,7 @@ exports.createDocument = (Model) =>
   catchAsync(async (req, res, next) => {
     const newDocument = await Model.create(req.body);
     res.status(201).json({
-      status: 'success',    
+      status: 'success',
       data: {
         data: newDocument,
       },
@@ -65,8 +65,14 @@ exports.getAllDocuments = (Model) =>
       .limitFields() // Apply field limiting: e.g., Model.find().select('name duration price')
       .paginate(); // Apply pagination: e.g., Model.find().skip(10).limit(10)
 
+    // const documents = await features.query.explain();
     // Execute the query
     const documents = await features.query;
+
+    // If no documents are found, return a 404 error
+    if (!documents.length) {
+      return next(new AppError('No documents found', 404));
+    }
 
     // Send a success response
     res.status(200).json({
@@ -78,9 +84,7 @@ exports.getAllDocuments = (Model) =>
     });
   });
 
-
-
-  exports.getDocument = (Model, popOptions) =>
+exports.getDocument = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
     let query = Model.findById(req.params.id);
     if (popOptions) query = query.populate(popOptions);
@@ -93,7 +97,7 @@ exports.getAllDocuments = (Model) =>
     res.status(200).json({
       status: 'success',
       data: {
-        data: document
-      }
+        data: document,
+      },
     });
   });

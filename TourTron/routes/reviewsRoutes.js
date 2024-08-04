@@ -8,24 +8,25 @@ const authController = require('../controllers/authController');
 // Middleware to protect all routes defined after this point
 router.use(authController.protect);
 
-router
-  .route('/')
-  .get(reviewController.getAllReviews)
-  .post(
-    authController.restrictTo('user'),
-    reviewController.setTourUserId,
-    reviewController.createReview,
-  );
+//if we get a route like below with tourId or not(in mergeParams) they all end up in this route('/') handler
+//Post - /tour/:tourId/reviews
+//Get - /tour/:tourId/reviews
+//Post - /tour/reviews
+router.route('/').get(reviewController.getAllReviews).post(
+  authController.restrictTo('user'),
+  reviewController.setTourUserId, // middleware to set tourId and userId for the review
+  reviewController.createReview,
+);
 
 router
   .route('/:id')
   .get(reviewController.getReview)
   .delete(
-    authController.restrictTo('admin', 'user'), // Only 'admin' or the user who created the review can delete it
+    authController.restrictTo('admin', 'user'),
     reviewController.deleteReview,
   )
   .patch(
-    authController.restrictTo('admin', 'user'), // Only 'admin' or the user who created the review can update it
+    authController.restrictTo('admin', 'user'),
     reviewController.updateReview,
   );
 

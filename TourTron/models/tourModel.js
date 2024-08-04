@@ -121,6 +121,10 @@ const tourSchema = new mongoose.Schema(
   },
 );
 
+// Indexes to improve performance
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+
 // Virtual Property: does not store data in the database
 tourSchema.virtual('durationWeek').get(function () {
   return this.duration / 7;
