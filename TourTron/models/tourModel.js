@@ -122,6 +122,7 @@ const tourSchema = new mongoose.Schema(
 );
 
 // Indexes to improve performance
+tourSchema.index({ startLocation: '2dsphere' });
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ slug: 1 });
 
@@ -159,10 +160,10 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 // Aggregation Middleware: runs before any aggregate query
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 

@@ -24,6 +24,14 @@ router.route('/monthly-plan/:year').get(
   tourControllers.getMonthlyPlan,
 );
 
+// Route to get tours within a certain distance
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourControllers.getToursWithin);
+
+// Route to get distance between two points
+router.route('/distances/:latlng/unit/:unit').get(tourControllers.getDistances);
+
 // Route to get all tours or create a new tour
 router
   .route('/')

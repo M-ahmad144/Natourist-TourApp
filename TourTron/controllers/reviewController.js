@@ -4,7 +4,7 @@ const factory = require('./handlerFactory');
 //middleware to set tourId and userId for the review
 exports.setTourUserId = (req, res, next) => {
   if (!req.body.tour) req.body.tour = req.params.tourId;
-  if (!req.body.user) req.body.user = req.user.id;
+  if (!req.body.user) req.body.user = req.user.id; //coming from the authController.protect
   next();
 };
 

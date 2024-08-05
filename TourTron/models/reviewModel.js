@@ -11,6 +11,7 @@ const reviewSchema = new mongoose.Schema(
       type: Number,
       min: 1,
       max: 5,
+      set: (val) => Math.round(val * 10) / 10,
     },
     createdAt: {
       type: Date,
@@ -32,6 +33,8 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
+
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 
 // Middleware to automatically populate tour and user fields
 reviewSchema.pre(/^find/, function (next) {
@@ -57,7 +60,6 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
     },
   ]);
 
-  // console.log(stats);
   if (stats.length > 0) {
     await Tour.findByIdAndUpdate(tourId, {
       ratingsQuantity: stats[0].nRatings,
@@ -66,30 +68,28 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
   } else {
     await Tour.findByIdAndUpdate(tourId, {
       ratingsQuantity: 0,
-      ratingsAverage: 4.5, //default value
+      ratingsAverage: 4.5, // default value
     });
   }
 };
 
 // Post middleware to recalculate average ratings after a review is saved
 reviewSchema.post('save', function () {
-  //In Static Methods: this.constructor lets you call  static methods of the same model
+  // 'this.constructor' lets you call static methods of the same model
   this.constructor.calcAverageRatings(this.tour);
 });
 
 // Pre middleware to get the current review before update/delete
-// We cannot simply use post middleware because first we have to get the updated/deleted review and then store it in the database and then upadate/delete it
+// We cannot simply use post middleware because first we have to get the updated/deleted review query and then use it in the post middleware to recalculate average ratings
 reviewSchema.pre(/^findOneAnd/, async function (next) {
-  // Get the currently updated/deleted review and store it in current query variable by doing this we can access it in the post middleware
-  this.review = await this.model.findOne(this.getFilter());
-
+  this.r = await this.model.findOne({});
   next();
 });
 
 // Post middleware to calculate average ratings after the pre middleware updated/deleted a review
 reviewSchema.post(/^findOneAnd/, async function () {
-  if (this.review) {
-    await this.review.constructor.calcAverageRatings(this.review.tour);
+  if (this.r) {
+    await this.r.constructor.calcAverageRatings(this.r.tour);
   }
 });
 
