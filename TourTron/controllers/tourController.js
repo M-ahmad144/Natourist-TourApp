@@ -15,7 +15,7 @@ exports.aliasToptour = (req, res, next) => {
 exports.getAllTours = factory.getAllDocuments(Tour);
 
 // Get a single tour
-exports.getTour = factory.getDocument(Tour, { path: 'reviews' });
+exports.getTour = factory.getDocument(Tour, { path: 'reviews' }); //path: 'reviews' is present in the Tour model virtual Schema
 
 // Create a new tour
 exports.createTour = factory.createDocument(Tour);

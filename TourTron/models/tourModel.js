@@ -153,7 +153,7 @@ tourSchema.pre(/^find/, function (next) {
 
 tourSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'guides',
+    path: 'guides', //select the guides field from the User model
     select: '-__v -passwordChangedAt',
   });
   next();
