@@ -73,7 +73,7 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
 
 // Post middleware to recalculate average ratings after a review is saved
 reviewSchema.post('save', function () {
-  //In Static Methods: this.constructor lets you call other static methods of the same model
+  //In Static Methods: this.constructor lets you call  static methods of the same model
   this.constructor.calcAverageRatings(this.tour);
 });
 
@@ -88,8 +88,6 @@ reviewSchema.pre(/^findOneAnd/, async function (next) {
 
 // Post middleware to calculate average ratings after the pre middleware updated/deleted a review
 reviewSchema.post(/^findOneAnd/, async function () {
-  // await this.findOne() does not work here as query already executed
-
   if (this.review) {
     await this.review.constructor.calcAverageRatings(this.review.tour);
   }
