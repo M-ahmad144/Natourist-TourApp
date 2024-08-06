@@ -1,4 +1,4 @@
-<<<<<<< HEAD:TourTron/docs/api.md
+
 # API Documentation
 
 ## Tours
@@ -195,4 +195,4 @@
   - JSON array of review objects
 =======
 
->>>>>>> b040ea1d40a9e387b9d72303c7f31d4a03f55e2e:README.md
+

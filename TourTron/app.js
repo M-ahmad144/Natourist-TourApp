@@ -11,6 +11,7 @@ const tourRouter = require('./routes/toursRoutes');
 const userRouter = require('./routes/usersRoutes');
 const reviewRouter = require('./routes/reviewsRoutes');
 const globalErrorHandler = require('./controllers/ErrController');
+const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
 
@@ -69,11 +70,8 @@ const limiter = rateLimit({
 
 app.use('/api', limiter); // Apply to all routes starting with /api
 
-app.get('/', (req, res) => {
-  res.status(200).render('base');
-});
-
 // Mounting Routers
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
