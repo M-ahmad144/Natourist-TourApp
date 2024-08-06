@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const AppErr = require('./utils/AppErr');
 const morgan = require('morgan');
 const helmet = require('helmet');
@@ -13,8 +14,12 @@ const globalErrorHandler = require('./controllers/ErrController');
 
 const app = express();
 
+// Set pug as the view engine
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
 // Serve static files
-app.use(express.static('./public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 //_________________________ Global Middlewares
 
@@ -63,6 +68,10 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter); // Apply to all routes starting with /api
+
+app.get('/', (req, res) => {
+  res.status(200).render('base');
+});
 
 // Mounting Routers
 app.use('/api/v1/tours', tourRouter);
