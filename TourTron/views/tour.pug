@@ -1,9 +1,10 @@
 extends base
 include _reviewCard
 
-block append head
-  script(src='https://api.mapbox.com/mapbox-gl-js/v0.54.0/mapbox-gl.js')
-  link(href='https://api.mapbox.com/mapbox-gl-js/v0.54.0/mapbox-gl.css' rel='stylesheet')
+  block append head
+  script(src='https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.js')
+  link(href='https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.css' rel='stylesheet')
+  
 
 mixin overviewBox(label, text, icon)
   .overview-box__detail
@@ -37,11 +38,11 @@ block content
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Quick facts
 
-          - const date = tour.startDates[0].toLocaleString('en-us', {month: 'long', year: 'numeric'})
+          - const date = new Date(tour.startDates[0]).toLocaleString('en-us', {month: 'long', year: 'numeric'})
           +overviewBox('Next date', date, 'calendar')
           +overviewBox('Difficulty', tour.difficulty, 'trending-up')
           +overviewBox('Participants', `${tour.maxGroupSize} people`, 'user')
-          +overviewBox('Rating', `${tour.ratingsAverage} / 5`, 'star')
+          +overviewBox('Rating', `${tour.ratingsAverage.toFixed(1)} / 5`, 'star')
 
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Your tour guides
@@ -58,8 +59,8 @@ block content
 
     .description-box
       h2.heading-secondary.ma-bt-lg= `About ${tour.name} tour`
-      - const parapraphs = tour.description.split('\n');
-      each p in parapraphs
+      - const paragraphs = tour.description.split('\n');
+      each p in paragraphs
         p.description__text= p
 
   section.section-pictures
@@ -68,7 +69,7 @@ block content
         img.picture-box__img(src=`/img/tours/${img}`, alt=`The Park Camper Tour ${i + 1}`, class=`picture-box__img--${i + 1}`)
 
   section.section-map
-    #map(data-locations=`${JSON.stringify(tour.locations)}`)
+    #map(style="width: 100%; height: 400px;", data-locations=`${JSON.stringify(tour.locations)}`)
 
   section.section-reviews
     .reviews

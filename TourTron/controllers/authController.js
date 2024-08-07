@@ -58,7 +58,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
 });
 
 //sign In User
-exports.signIn = catchAsync(async (req, res, next) => {
+exports.logIn = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   // Check if email and password are provided
@@ -87,6 +87,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {

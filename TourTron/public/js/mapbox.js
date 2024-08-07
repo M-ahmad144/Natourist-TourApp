@@ -1,25 +1,23 @@
-/* eslint-disable */
-export const displayMap = (locations) => {
-  mapboxgl.accessToken =
-    'pk.eyJ1Ijoiam9uYXNzY2htZWR0bWFubiIsImEiOiJjam54ZmM5N3gwNjAzM3dtZDNxYTVlMnd2In0.ytpI7V7w7cyT1Kq5rT9Z1A';
+// mapbox.js
 
-  var map = new mapboxgl.Map({
+// import mapboxgl from 'https://unpkg.com/mapbox-gl@2.7.0/dist/mapbox-gl.js';
+
+const displayMap = (locations) => {
+  mapboxgl.accessToken =
+    'pk.eyJ1IjoiYWhtYWQ3ODc3IiwiYSI6ImNsempwc2xkMTB1YnkyanNpMWsyMGlod20ifQ.QEqRPC3aSV-6bNlHaWbfeA';
+
+  const map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/jonasschmedtmann/cjvi9q8jd04mi1cpgmg7ev3dy',
+    style: 'mapbox://styles/mapbox/light-v11',
     scrollZoom: false,
-    // center: [-118.113491, 34.111745],
-    // zoom: 10,
-    // interactive: false
   });
 
   const bounds = new mapboxgl.LngLatBounds();
 
   locations.forEach((loc) => {
-    // Create marker
     const el = document.createElement('div');
     el.className = 'marker';
 
-    // Add marker
     new mapboxgl.Marker({
       element: el,
       anchor: 'bottom',
@@ -27,7 +25,6 @@ export const displayMap = (locations) => {
       .setLngLat(loc.coordinates)
       .addTo(map);
 
-    // Add popup
     new mapboxgl.Popup({
       offset: 30,
     })
@@ -35,7 +32,6 @@ export const displayMap = (locations) => {
       .setHTML(`<p>Day ${loc.day}: ${loc.description}</p>`)
       .addTo(map);
 
-    // Extend map bounds to include current location
     bounds.extend(loc.coordinates);
   });
 
@@ -48,3 +44,11 @@ export const displayMap = (locations) => {
     },
   });
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+  const mapElement = document.getElementById('map');
+  if (mapElement) {
+    const locations = JSON.parse(mapElement.dataset.locations);
+    displayMap(locations);
+  }
+});

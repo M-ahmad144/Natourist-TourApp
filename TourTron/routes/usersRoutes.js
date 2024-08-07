@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Authentication routes - open to everyone
 router.post('/signup', authController.signUp);
-router.post('/signIn', authController.signIn);
+router.post('/logIn', authController.logIn);
 router.post('/forgetPassword', authController.forgetPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
