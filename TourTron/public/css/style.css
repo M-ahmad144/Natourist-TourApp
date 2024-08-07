@@ -1322,3 +1322,94 @@ body {
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
 }
+
+/* Sign-up form container */
+.signup-form {
+  margin: 0 auto;
+  max-width: 55rem;
+  background-color: #fff;
+  box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  padding: 5rem 7rem;
+  border-radius: 5px;
+}
+
+/* Form input styles */
+.form__input {
+  display: block;
+  font-family: inherit;
+  font-size: 1.5rem;
+  color: inherit;
+  padding: 1.25rem 1.75rem;
+  border: none;
+  width: 100%;
+  background-color: #f2f2f2;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Focus state for input */
+.form__input:focus {
+  outline: none;
+  border-bottom: 3px solid #55c57a;
+}
+
+/* Invalid state for input */
+.form__input:focus:invalid {
+  border-bottom: 3px solid #ff7730;
+}
+
+/* Placeholder styles */
+.form__input::-webkit-input-placeholder {
+  color: #bbb;
+}
+
+/* Margin for form groups */
+.form__group:not(:last-child) {
+  margin-bottom: 2.5rem;
+}
+
+/* Form label styles */
+.form__label {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+/* Profile image input styles */
+.form__input[type='file'] {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background-color: #fff;
+  border: 2px solid #ddd;
+  cursor: pointer;
+}
+
+.form__input[type='file']:focus {
+  border-color: #55c57a;
+  outline: none;
+}
+
+/* Sign-up button styles */
+.btn--green {
+  display: inline-block;
+  background-color: #55c57a;
+  color: #fff;
+  font-size: 1.6rem;
+  padding: 1.25rem 2.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn--green:hover {
+  background-color: #45a049;
+}
+
+.btn--green:active {
+  background-color: #388e3c;
+}
