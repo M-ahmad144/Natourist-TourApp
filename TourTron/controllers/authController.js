@@ -123,7 +123,32 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
-//restrict common user
+//IsLoggedIn
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    // 1- verify the token
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET,
+    );
+    // 2- Check if the user still exists. This ensures the user has not been deleted after the token was issued.
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next();
+    }
+    // 3- Check if user changed the password after the token was issued
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+
+    // There is a logged in user
+    res.locals.user = currentUser; //add the user to the locals object to be used in the pug template
+    return next();
+  }
+  next();
+});
+
+//restrict  to specific roles
 exports.restrictTo = (...roles) => {
   // ...roles will contain the array of user roles
   return (req, res, next) => {

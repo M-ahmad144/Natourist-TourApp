@@ -31,12 +31,33 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", 'https://cdnjs.cloudflare.com'], // Allow external scripts
-        // Add other directives as needed
+        imgSrc: [
+          "'self'",
+          'data:',
+          'https://unpkg.com',
+          'https://tile.openstreetmap.org',
+          'https://c.tile.openstreetmap.org',
+        ],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          'https://fonts.googleapis.com',
+          'https://unpkg.com',
+        ],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        connectSrc: ["'self'", 'ws://127.0.0.1:57698'],
       },
     },
   }),
 );
+
+const cspPolicy = `default-src 'self'; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org https://c.tile.openstreetmap.org; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws://127.0.0.1:57698;`;
+
+app.use((req, res, next) => {
+  res.locals.cspPolicy = cspPolicy;
+  next();
+});
 
 // Parse incoming JSON requests into req.body
 app.use(express.json({ limit: '10kb' }));

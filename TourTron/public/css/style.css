@@ -1,3 +1,5 @@
+/* @import url('https://unpkg.com/leaflet/dist/leaflet.css'); */
+
 :root {
   --section-rotate: 9vw;
 }
@@ -1412,4 +1414,22 @@ body {
 
 .btn--green:active {
   background-color: #388e3c;
+}
+
+/* map */
+
+.marker {
+  width: 24px;
+  height: 24px;
+  background-color: #ff6f61;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker img {
+  width: 24px;
+  height: 24px;
 }
