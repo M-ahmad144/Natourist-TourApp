@@ -8,18 +8,24 @@ exports.getOverview = catchAsync(async (req, res, next) => {
     tours,
   });
 });
-
 exports.getTour = catchAsync(async (req, res, next) => {
+  // Find the tour by slug and populate the reviews
   const tour = await Tour.findOne({ slug: req.params.slug }).populate({
     path: 'reviews',
-    fields: 'review rating user',
+    select: 'review rating user',
   });
+
+  // If the tour doesn't exist, throw an error
+  if (!tour) {
+    return next(new AppError('There is no tour with that name.', 404));
+  }
+
+  // Render the tour page
   res.status(200).render('tour', {
     title: `${tour.name} tour`,
     tour,
   });
 });
-
 exports.getLoginForm = catchAsync(async (req, res, next) => {
   res.status(200).render('login', {
     title: 'Log into your account',

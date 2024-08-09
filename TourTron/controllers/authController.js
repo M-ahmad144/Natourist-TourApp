@@ -78,6 +78,15 @@ exports.logIn = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
+//log out
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 //protect the routes from not signUp/SignIn user
 exports.protect = catchAsync(async (req, res, next) => {
   // 1- getting token and check if it exists
@@ -124,29 +133,35 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 //IsLoggedIn
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => {
   if (req.cookies.jwt) {
-    // 1- verify the token
-    const decoded = await promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET,
-    );
-    // 2- Check if the user still exists. This ensures the user has not been deleted after the token was issued.
-    const currentUser = await User.findById(decoded.id);
-    if (!currentUser) {
-      return next();
-    }
-    // 3- Check if user changed the password after the token was issued
-    if (currentUser.changedPasswordAfter(decoded.iat)) {
-      return next();
-    }
+    try {
+      // 1- verify the token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET,
+      );
+      // 2- Check if the user still exists. This ensures the user has not been deleted after the token was issued.
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+      // 3- Check if user changed the password after the token was issued
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
 
-    // There is a logged in user
-    res.locals.user = currentUser; //add the user to the locals object to be used in the pug template
-    return next();
+      // There is a logged in user
+      res.locals.user = currentUser; //add the user to the locals object to be used in the pug template e.g header
+
+      return next();
+    } catch (err) {
+      return next();
+    }
   }
+
   next();
-});
+};
 
 //restrict  to specific roles
 exports.restrictTo = (...roles) => {

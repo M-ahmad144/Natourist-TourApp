@@ -11,8 +11,6 @@ router.use(auth.isLoggedIn);
 router.get('/', viewsController.getOverview);
 router.get('/login', viewsController.getLoginForm);
 router.get('/signUp', viewsController.getSignupForm);
-
-// Protected routes
 router.get('/tour/:slug', viewsController.getTour);
 
 module.exports = router;
