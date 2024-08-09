@@ -26,7 +26,7 @@ export const displayMap = (locations) => {
     const marker = document.createElement('div');
     marker.className = 'marker';
     // Optional: Add content if needed
-    marker.innerHTML = '<span>📍</span>'; // Unicode for a location pin
+    marker.innerHTML = '<span>📍</span>';
 
     new Overlay({
       position: fromLonLat([loc.coordinates[0], loc.coordinates[1]]),

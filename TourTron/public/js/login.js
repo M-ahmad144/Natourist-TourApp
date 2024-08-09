@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { showAlert } from './alert.js';
 
 export const login = async (email, password) => {
   try {
@@ -11,12 +12,12 @@ export const login = async (email, password) => {
       },
     });
     if (res.data.status === 'success') {
-      alert('Logged in successfully');
+      showAlert('success', 'Logged in successfully');
       window.setTimeout(() => {
         location.assign('/');
       }, 1500);
     }
   } catch (e) {
-    alert(e.response.data.message);
+    showAlert('error', e.response.data.message);
   }
 };
