@@ -1,13 +1,11 @@
-// Import other necessary modules
 import 'leaflet/dist/leaflet.css';
 import 'ol/ol.css';
 import { displayMap } from './map';
 import { login } from './login';
 import { logout } from './logout';
-import { protect } from './protectFromUerFromToursDetails';
 
 // DOM Elements
-const loginForm = document.querySelector('.form');
+const loginForm = document.querySelector('.form--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const mapElement = document.getElementById('map');
 

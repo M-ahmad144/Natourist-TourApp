@@ -1,6 +1,7 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.post('/forgetPassword', authController.forgetPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
 // Protected routes middleware - protcts all routes after this are protected
-router.use(authController.protect);
+router.use(authMiddleware.protect);
 
 // Update the current user's password
 router.patch('/updateMyPassword', authController.updatePassword);
@@ -28,7 +29,7 @@ router.patch('/updateMe', userController.updateMe);
 router.delete('/deleteMe', userController.deleteMe);
 
 //after this middleware, only admin can access these routes
-router.use(authController.restrictTo('admin'));
+router.use(authMiddleware.restrictTo('admin'));
 
 // User management routes for admins
 router

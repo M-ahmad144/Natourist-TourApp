@@ -61,6 +61,7 @@ app.use((req, res, next) => {
 
 // Parse incoming JSON requests into req.body
 app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Parse incoming cookies
 app.use(cookieParser());
@@ -105,7 +106,6 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter); // Apply to all routes starting with /api
-
 // Mounting Routers
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);

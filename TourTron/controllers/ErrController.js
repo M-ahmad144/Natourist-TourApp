@@ -19,33 +19,59 @@ const handleValidationErrorDB = (err) => {
   return new AppErr(msg, 400);
 };
 
-const handleJWTErr = () => new AppErr('Invalid token . please try again', 401);
+const handleJWTErr = () =>
+  new AppErr('Please login first, invalid token ', 401);
 
 const handleTokenExpiredError = () =>
   new AppErr('Token expired , please login again', 401);
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
-    message: err.message,
-    stack: err.stack,
-  });
-};
-
-const sendErrorProd = (err, res) => {
-  if (err.isOperational) {
-    return res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
+const sendErrorDev = (err, req, res) => {
+  // API
+  if (req.originalUrl.startsWith('/api')) {
+    res.status(err.statusCode || 500).json({
+      status: err.status || 'error',
+      error: err,
+      message: err.message || 'Internal Server Error',
+      stack: err.stack || 'No stack trace available',
     });
   } else {
+    // RENDERED WEBSITE
+    res.status(err.statusCode || 500).render('error', {
+      title: 'Something went wrong',
+      msg: err.message || 'An error occurred',
+    });
+  }
+};
+
+const sendErrorProd = (err, req, res) => {
+  // API
+  if (req.originalUrl.startsWith('/api')) {
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status || 'error',
+        message: err.message || 'An error occurred',
+      });
+    }
+    // Log the error for the developer
     console.error('ERROR:', err);
     return res.status(500).json({
       status: 'error',
       message: 'Something went wrong, please try again later.',
     });
   }
+  // RENDERED WEBSITE
+  if (err.isOperational) {
+    return res.status(err.statusCode).render('error', {
+      title: 'Something went wrong',
+      msg: err.message,
+    });
+  }
+  // Log the error for the developer
+  console.error('ERROR:', err);
+  return res.status(500).render('error', {
+    title: 'Something went wrong',
+    msg: err.message,
+  });
 };
 
 module.exports = (err, req, res, next) => {
@@ -53,14 +79,15 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(err, res);
+    sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
-    let error = Object.assign({}, err);
+    let error = { ...err };
+    error.message = err.message;
     if (error.name === 'CastError') error = handleCastErrorDB(err);
     if (error.code === 11000) error = handleDuplicateFieldsDB(err);
     if (error.name === 'ValidationError') error = handleValidationErrorDB(err);
     if (error.name === 'JsonWebTokenError') error = handleJWTErr();
     if (error.name === 'TokenExpiredError') error = handleTokenExpiredError();
-    sendErrorProd(error, res);
+    sendErrorProd(error, req, res);
   }
 };

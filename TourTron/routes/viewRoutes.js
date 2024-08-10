@@ -1,16 +1,19 @@
 const express = require('express');
 const viewsController = require('../controllers/viewsController');
-const auth = require('../controllers/authController');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-// Middleware to check if the user is logged in
-router.use(auth.isLoggedIn);
-
 // Public routes accessible without authentication
-router.get('/', viewsController.getOverview);
-router.get('/login', viewsController.getLoginForm);
-router.get('/signUp', viewsController.getSignupForm);
-router.get('/tour/:slug', viewsController.getTour);
+router.get('/', authMiddleware.isLoggedIn, viewsController.getOverview);
+router.get('/login', authMiddleware.isLoggedIn, viewsController.getLoginForm);
+router.get('/signUp', authMiddleware.isLoggedIn, viewsController.getSignupForm);
+router.get(
+  '/tour/:slug',
+  authMiddleware.isLoggedIn,
+  authMiddleware.protect,
+  viewsController.getTour,
+);
+router.get('/me', authMiddleware.protect, viewsController.getAccount);
 
 module.exports = router;

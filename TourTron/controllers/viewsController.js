@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
+const AppErr = require('../utils/AppErr');
 
 exports.getOverview = catchAsync(async (req, res, next) => {
   const tours = await Tour.find();
@@ -17,7 +18,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
 
   // If the tour doesn't exist, throw an error
   if (!tour) {
-    return next(new AppError('There is no tour with that name.', 404));
+    return next(new AppErr('There is no tour with that name.', 404));
   }
 
   // Render the tour page
@@ -26,14 +27,20 @@ exports.getTour = catchAsync(async (req, res, next) => {
     tour,
   });
 });
-exports.getLoginForm = catchAsync(async (req, res, next) => {
+exports.getLoginForm = (req, res) => {
   res.status(200).render('login', {
     title: 'Log into your account',
   });
-});
+};
 
-exports.getSignupForm = catchAsync(async (req, res, next) => {
+exports.getSignupForm = (req, res) => {
   res.status(200).render('signUp', {
     title: 'Create your account',
   });
-});
+};
+
+exports.getAccount = (req, res) => {
+  res.status(200).render('account', {
+    title: 'Your account',
+  });
+};
