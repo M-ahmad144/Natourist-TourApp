@@ -13,9 +13,7 @@ router.get('/logout', authController.logout);
 router.post('/forgetPassword', authController.forgetPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-
 router.use(authMiddleware.protect);
-
 
 router.patch('/updateMyPassword', authController.updatePassword);
 
@@ -25,13 +23,16 @@ router.get(
   userController.getUser,
 );
 
-router.patch('/updateMe', userController.updateMe);
+router.patch(
+  '/updateMe',
+  userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
+  userController.updateMe,
+);
 // Deactivate the current user's account
 router.delete('/deleteMe', userController.deleteMe);
 
-
 router.use(authMiddleware.restrictTo('admin'));
-
 
 router
   .route('/')

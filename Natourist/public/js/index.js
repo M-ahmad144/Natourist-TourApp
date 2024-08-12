@@ -33,11 +33,30 @@ if (loginForm) {
 }
 
 if (formUserData) {
+  const photoInput = document.getElementById('photo');
+  const photoPreview = document.getElementById('photoPreview');
+
+  // Preview the image when a new one is selected
+  photoInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        photoPreview.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
   formUserData.addEventListener('submit', (e) => {
     e.preventDefault();
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    updateSettings({ name, email }, 'data');
+    const form = new FormData(); // Creating multipart form data
+    form.append('name', document.getElementById('name').value);
+    form.append('email', document.getElementById('email').value);
+    form.append('photo', document.getElementById('photo').files[0]);
+    console.log(form);
+
+    updateSettings(form, 'data');
   });
 }
 
