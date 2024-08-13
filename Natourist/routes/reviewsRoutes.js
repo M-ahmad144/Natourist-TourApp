@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
+const authMiddleware = require('../middlewares/authMiddleware');
 // mergeParams: true allows this router to access parameters from the parent router
 // (e.g., :tourId from routes defined in tourRouter)
 const reviewController = require('../controllers/reviewController');
