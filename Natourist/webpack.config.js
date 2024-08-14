@@ -1,16 +1,16 @@
 const path = require('path');
 
 module.exports = {
-  entry: './public/js',
+  entry: './public/js/index.js', // Entry point should be your main JS file
   output: {
-    filename: 'bundle.js', // The output file name
-    path: path.resolve(__dirname, 'public/js'), // The output directory
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'public/js'),
   },
-  mode: 'development', // Set to 'production' for optimized builds
+  mode: 'development',
   module: {
     rules: [
       {
-        test: /\.js$/, // Apply Babel loader to JavaScript files
+        test: /\.js$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
@@ -20,12 +20,12 @@ module.exports = {
         },
       },
       {
-        test: /\.css$/, // Apply CSS loaders
+        test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
-      // Add more loaders as needed for other file types (e.g., images, fonts)
+      // Add more loaders as needed for other file types
     ],
   },
-  devtool: 'source-map', // Optional: generates source maps for debugging
-  watch: false, // Use this to override the watch mode in your script
+  devtool: 'source-map',
+  watch: false,
 };

@@ -4,6 +4,7 @@ import { displayMap } from './map';
 import { login } from './login';
 import { logout } from './logout';
 import { updateSettings } from './updateSettings';
+import { bookTour } from './stripe';
 
 // DOM Elements
 const loginForm = document.querySelector('.form--login');
@@ -11,6 +12,7 @@ const formUserData = document.querySelector('.form-user-data');
 const formUserPassword = document.querySelector('.form-user-password');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const mapElement = document.getElementById('map');
+const bookBtn = document.getElementById('book-tour');
 
 // Check if the map element exists and initialize the map
 if (mapElement) {
@@ -89,5 +91,13 @@ if (formUserPassword) {
     document.getElementById('password-current').value = '';
     document.getElementById('password').value = '';
     document.getElementById('password-confirm').value = '';
+  });
+}
+
+if (bookBtn) {
+  bookBtn.addEventListener('click', (e) => {
+    e.target.textContent = 'Processing...';
+    const { tourId } = e.target.dataset;
+    bookTour(tourId);
   });
 }

@@ -7,12 +7,14 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
+
 const tourRouter = require('./routes/toursRoutes');
 const userRouter = require('./routes/usersRoutes');
 const reviewRouter = require('./routes/reviewsRoutes');
-const globalErrorHandler = require('./controllers/ErrController');
 const viewRouter = require('./routes/viewRoutes');
-const cookieParser = require('cookie-parser');
+const bookingRouter = require('./routes/bookingRoutes');
+const globalErrorHandler = require('./controllers/ErrController');
 
 const app = express();
 
@@ -38,7 +40,8 @@ app.use(
           'https://tile.openstreetmap.org',
           'https://c.tile.openstreetmap.org',
         ],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://js.stripe.com'],
+        scriptSrcElem: ["'self'", 'https://js.stripe.com'],
         styleSrc: [
           "'self'",
           "'unsafe-inline'",
@@ -47,17 +50,11 @@ app.use(
         ],
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
         connectSrc: ["'self'", 'ws://127.0.0.1:57698'],
+        frameSrc: ['https://js.stripe.com', 'https://hooks.stripe.com'],
       },
     },
   }),
 );
-
-const cspPolicy = `default-src 'self'; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org https://c.tile.openstreetmap.org; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws://127.0.0.1:57698;`;
-
-app.use((req, res, next) => {
-  res.locals.cspPolicy = cspPolicy;
-  next();
-});
 
 // Parse incoming JSON requests into req.body
 app.use(express.json({ limit: '10kb' }));
@@ -66,10 +63,10 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // Parse incoming cookies
 app.use(cookieParser());
 
-//Data Sanitization against NoSQL query injection
+// Data Sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
-//Data Sanitization against XSS (malachous HTML code)
+// Data Sanitization against XSS (malicious HTML code)
 app.use(xss());
 
 // Prevent parameter pollution
@@ -89,7 +86,6 @@ app.use(
 // Add request time to the request object
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-
   next();
 });
 
@@ -106,11 +102,13 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter); // Apply to all routes starting with /api
+
 // Mounting Routers
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 // Handle undefined routes
 app.all('*', (req, res, next) => {
