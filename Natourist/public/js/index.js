@@ -58,6 +58,7 @@ if (loginForm) {
     const signInBtn = document.querySelector('#signInSubmit');
       signInBtn.textContent = 'Processing...';
     await login(email, password);
+    signInBtn.textContent = 'Sign In';
   });
 }
 
@@ -91,30 +92,25 @@ if (formUserData) {
 }
 
 if (formUserPassword) {
-  formUserPassword.addEventListener('submit', async (e) => {
+  formUserPassword.addEventListener('submit',  (e) => {
     e.preventDefault();
 
     const saveBtn = document.querySelector('.btn--save-password');
-    const spinner = document.querySelector('.loading-spinner');
 
     // Add updating state
     saveBtn.textContent = 'Updating...';
-    saveBtn.classList.add('updating');
-    spinner.classList.remove('hidden');
 
     const passwordCurrent = document.getElementById('password-current').value;
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password-confirm').value;
 
-    await updateSettings(
+     updateSettings(
       { passwordCurrent, password, passwordConfirm },
       'password',
     );
 
     // Reset button and form
     saveBtn.textContent = 'Save Password';
-    saveBtn.classList.remove('updating');
-    spinner.classList.add('hidden');
 
     document.getElementById('password-current').value = '';
     document.getElementById('password').value = '';

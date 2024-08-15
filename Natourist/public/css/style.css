@@ -142,6 +142,8 @@ body {
   font-size: 3.5rem;
 }
 
+
+
 .heading-primary,
 .heading-tertirary {
   color: #fff;
@@ -220,8 +222,8 @@ body {
 }
 
 .btn:focus {
-  outline: none;
-  background-color: #2e864b;
+  outline: 3px solid #55c57a; /* Enhance visibility */
+  outline-offset: 2px; /* Ensure it’s visible and not too close to the element */
 }
 
 .btn--white {
@@ -299,43 +301,52 @@ body {
   outline: 3px solid #55c57a;
   outline-offset: 3px;
 }
-
 .header {
   background-color: #444;
   padding: 0 5rem;
   height: 8rem;
   position: relative;
   z-index: 100;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
   justify-content: space-between;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
+  flex-wrap: wrap; /* Allow items to wrap on smaller screens */
 }
-@media only screen and (max-width: 62.5em) {
-  .header {
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
-  }
-}
+
 .header__logo img {
   height: 3.5rem;
 }
+
+/* Adjusting the header for smaller screens */
 @media only screen and (max-width: 62.5em) {
+  .header {
+    flex-direction: column; /* Stack the header items vertically */
+    height: auto; /* Allow height to adjust based on content */
+    padding: 1rem 2rem; /* Reduce padding on smaller screens */
+  }
+
   .header__logo {
-    -webkit-box-ordinal-group: 0;
-    -ms-flex-order: -1;
-    order: -1;
-    margin-bottom: 1.5rem;
+    order: -1; /* Move logo to the top */
+    margin-bottom: 1rem; /* Add spacing below the logo */
   }
 }
 
+/* Further adjustments for very small screens (mobile devices) */
+@media only screen and (max-width: 37.5em) {
+  .header {
+    padding: 0.5rem 1rem; /* Further reduce padding */
+  }
+
+  .header__logo img {
+    height: 3rem; /* Reduce logo size */
+  }
+  
+  .header__logo {
+    margin-bottom: 0.5rem; /* Reduce margin below the logo */
+  }
+}
+
+/* Section Header */
 .section-header {
   position: relative;
   height: 38vw;
@@ -353,16 +364,15 @@ body {
   );
 }
 
+/* Header Hero Section */
 .header__hero {
   height: 100%;
 }
 
 .header__hero-img {
-  -o-object-fit: cover;
   object-fit: cover;
   height: 100%;
   width: 100%;
-  -o-object-position: 50% 25%;
   object-position: 50% 25%;
 }
 
@@ -370,16 +380,10 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-image: -webkit-gradient(
-    linear,
-    left top,
-    right bottom,
-    from(#7dd56f),
-    to(#28b487)
-  );
   background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
   opacity: 0.85;
 }
+
 
 .heading-box {
   position: absolute;
@@ -764,36 +768,67 @@ body {
   min-height: 100vh;
   border-radius: 3px;
   overflow: hidden;
-  -webkit-box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.07);
   box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.07);
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
+  flex-direction: row; /* Default layout is side by side */
 }
+
 .user-view__menu {
-  -webkit-box-flex: 32rem;
-  -ms-flex: 32rem 0 0px;
-  flex: 32rem 0 0;
-  background-image: -webkit-gradient(
-    linear,
-    left top,
-    right bottom,
-    from(#7dd56f),
-    to(#28b487)
-  );
+  flex: 0 0 32rem; /* Sidebar has a fixed width of 32rem */
   background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
   padding: 4rem 0;
 }
+
 .user-view__content {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
+  flex: 1; /* Content takes up remaining space */
   padding: 7rem 0;
 }
+
 .user-view__form-container {
   max-width: 68rem;
   margin: 0 auto;
   padding: 0 8rem;
+}
+
+/* Responsive Adjustments */
+
+/* For screens with a max-width of 768px (tablets and smaller) */
+@media (max-width: 768px) {
+  .user-view {
+    flex-direction: column; /* Stack sidebar on top of content */
+    padding: 0;
+  }
+
+  .user-view__menu {
+    flex: 0 0 auto; /* Sidebar takes full width on top */
+    width: 100%;
+    padding: 2rem 0; /* Reduce padding for smaller screens */
+  }
+
+  .user-view__content {
+    flex: 1;
+    padding: 3rem 2rem; /* Reduce padding for smaller screens */
+  }
+
+  .user-view__form-container {
+    max-width: 100%; /* Full width form container */
+    padding: 0 2rem; /* Reduce side padding */
+  }
+}
+
+/* For screens with a max-width of 430px (small mobile devices) */
+@media (max-width: 430px) {
+  .user-view__menu {
+    padding: 1.5rem 0; /* Further reduce padding */
+  }
+
+  .user-view__content {
+    padding: 2rem 1rem; /* Further reduce padding */
+  }
+
+  .user-view__form-container {
+    padding: 0 1rem; /* Minimize padding for very small screens */
+  }
 }
 
 .footer {
@@ -814,6 +849,35 @@ body {
     justify-items: center;
   }
 }
+/* Medium Screens (min-width: 37.5em ~ 600px and max-width: 64em ~ 1024px) */
+@media (min-width: 37.5em) and (max-width: 64em) {
+  /* Grid layout for cards */
+  .cards-container {
+    grid-template-columns: 1fr 1fr; /* 2 columns per card */
+  }
+
+  .reviews {
+    grid-template-columns: 1fr; /* 1 card per row on small screens */
+    grid-row-gap: 2rem; /* Add some vertical space between cards */
+  }
+}
+
+/* Large Screens (min-width: 64em ~ 1024px and up) */
+@media (min-width: 64em) {
+  /* Grid layout for cards */
+  .cards-container {
+    grid-template-columns: 3fr 3fr 3fr; /* 3 columns per card, each column taking up 3fr */
+  }
+}
+
+/* Small Screens (max-width: 37.5em ~ 600px) */
+@media (max-width: 37.5em) {
+  /* Grid layout for cards */
+  .cards-container {
+    grid-template-columns: 1fr; /* 1 column per card */
+  }
+}
+
 .footer__logo {
   grid-row: 1 / 3;
   -ms-flex-item-align: center;
@@ -864,14 +928,14 @@ body {
   -ms-flex-align: center;
   align-items: center;
 }
-@media only screen and (max-width: 37.5em) {
+/* @media only screen and (max-width: 37.5em) {
   .nav {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -ms-flex-direction: column;
     flex-direction: column;
   }
-}
+} */
 .nav--tours {
   -webkit-box-flex: 0;
   -ms-flex: 0 1 40%;
@@ -925,12 +989,12 @@ body {
 .nav__el:not(:last-child) {
   margin-right: 3rem;
 }
-@media only screen and (max-width: 37.5em) {
+/* @media only screen and (max-width: 37.5em) {
   .nav__el:not(:last-child) {
     margin-right: 0;
     margin-bottom: 1.2rem;
   }
-}
+} */
 .nav__el:focus {
   outline: none;
 }
@@ -955,14 +1019,14 @@ body {
   -ms-flex-align: center;
   align-items: center;
 }
-@media only screen and (max-width: 37.5em) {
+/* @media only screen and (max-width: 37.5em) {
   .nav__search {
     -webkit-box-ordinal-group: 0;
     -ms-flex-order: -1;
     order: -1;
     margin-bottom: 1.2rem;
   }
-}
+} */
 .nav__search-btn {
   background: none;
   border: none;
@@ -1075,7 +1139,7 @@ body {
   max-width: 120rem;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* grid-template-columns: repeat(3, 1fr); */
   grid-gap: 7rem;
 }
 
@@ -1471,3 +1535,6 @@ body {
 .hidden {
   display: none;
 }
+
+
+/* sidebar */

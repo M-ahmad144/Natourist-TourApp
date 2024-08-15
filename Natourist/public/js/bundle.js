@@ -365,7 +365,7 @@ var updateSettings = /*#__PURE__*/function () {
       while (1) switch (_context.prev = _context.next) {
         case 0:
           _context.prev = 0;
-          url = type === 'password' ? '/api/v1/users/updateMyPassword' : '/api/v1/users/updateMe';
+          url = type === 'password' ? 'http://127.0.0.1:3000/api/v1/users/updateMyPassword' : 'http://127.0.0.1:3000/api/v1/users/updateMe';
           _context.next = 4;
           return (0,axios__WEBPACK_IMPORTED_MODULE_1__["default"])({
             method: 'PATCH',
@@ -48218,6 +48218,8 @@ if (loginForm) {
             _context.next = 7;
             return (0,_login__WEBPACK_IMPORTED_MODULE_3__.login)(email, password);
           case 7:
+            signInBtn.textContent = 'Sign In';
+          case 8:
           case "end":
             return _context.stop();
         }
@@ -48254,45 +48256,27 @@ if (formUserData) {
   });
 }
 if (formUserPassword) {
-  formUserPassword.addEventListener('submit', /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(e) {
-      var saveBtn, spinner, passwordCurrent, password, passwordConfirm;
-      return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-        while (1) switch (_context2.prev = _context2.next) {
-          case 0:
-            e.preventDefault();
-            saveBtn = document.querySelector('.btn--save-password');
-            spinner = document.querySelector('.loading-spinner'); // Add updating state
-            saveBtn.textContent = 'Updating...';
-            saveBtn.classList.add('updating');
-            spinner.classList.remove('hidden');
-            passwordCurrent = document.getElementById('password-current').value;
-            password = document.getElementById('password').value;
-            passwordConfirm = document.getElementById('password-confirm').value;
-            _context2.next = 11;
-            return (0,_updateSettings__WEBPACK_IMPORTED_MODULE_5__.updateSettings)({
-              passwordCurrent: passwordCurrent,
-              password: password,
-              passwordConfirm: passwordConfirm
-            }, 'password');
-          case 11:
-            // Reset button and form
-            saveBtn.textContent = 'Save Password';
-            saveBtn.classList.remove('updating');
-            spinner.classList.add('hidden');
-            document.getElementById('password-current').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('password-confirm').value = '';
-          case 17:
-          case "end":
-            return _context2.stop();
-        }
-      }, _callee2);
-    }));
-    return function (_x2) {
-      return _ref2.apply(this, arguments);
-    };
-  }());
+  formUserPassword.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var saveBtn = document.querySelector('.btn--save-password');
+
+    // Add updating state
+    saveBtn.textContent = 'Updating...';
+    var passwordCurrent = document.getElementById('password-current').value;
+    var password = document.getElementById('password').value;
+    var passwordConfirm = document.getElementById('password-confirm').value;
+    (0,_updateSettings__WEBPACK_IMPORTED_MODULE_5__.updateSettings)({
+      passwordCurrent: passwordCurrent,
+      password: password,
+      passwordConfirm: passwordConfirm
+    }, 'password');
+
+    // Reset button and form
+    saveBtn.textContent = 'Save Password';
+    document.getElementById('password-current').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('password-confirm').value = '';
+  });
 }
 if (bookBtn) {
   bookBtn.addEventListener('click', function (e) {
