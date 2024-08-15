@@ -5,9 +5,11 @@ import { login } from './login';
 import { logout } from './logout';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './stripe';
+ import { signUp } from './signUp';
 
 // DOM Elements
 const loginForm = document.querySelector('.form--login');
+const signupForm = document.querySelector('.signup-form');
 const formUserData = document.querySelector('.form-user-data');
 const formUserPassword = document.querySelector('.form-user-password');
 const logOutBtn = document.querySelector('.nav__el--logout');
@@ -24,15 +26,41 @@ if (logOutBtn) {
   logOutBtn.addEventListener('click', logout);
 }
 
+if (signupForm) { 
+    signupForm.addEventListener('submit',  (e) => {
+      e.preventDefault();
+      // Gather form data
+      const name = document.querySelector('#name').value;
+      const email = document.querySelector('#email').value;
+      const password = document.querySelector('#password').value;
+      const passwordConfirm = document.querySelector('#passwordConfirm').value;
+      // Show loading spinner
+      const signUpBtn = document.querySelector('#signUpSubmit');
+      signUpBtn.textContent = 'Processing...';
+       signUp(name, email, password, passwordConfirm);
+        
+        // Clear fields after successful sign-up
+        document.querySelector('#name').value = '';
+        document.querySelector('#email').value = '';
+        document.querySelector('#password').value = '';
+      document.querySelector('#passwordConfirm').value = '';
+       signUpBtn.textContent = 'Sign Up';
+    });
+  }
+
 // Handle form submission for login
 if (loginForm) {
-  loginForm.addEventListener('submit', (e) => {
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.querySelector('#email').value;
     const password = document.querySelector('#password').value;
-    login(email, password);
+
+    const signInBtn = document.querySelector('#signInSubmit');
+      signInBtn.textContent = 'Processing...';
+    await login(email, password);
   });
 }
+
 
 if (formUserData) {
   const photoInput = document.getElementById('photo');
@@ -93,6 +121,7 @@ if (formUserPassword) {
     document.getElementById('password-confirm').value = '';
   });
 }
+
 
 if (bookBtn) {
   bookBtn.addEventListener('click', (e) => {

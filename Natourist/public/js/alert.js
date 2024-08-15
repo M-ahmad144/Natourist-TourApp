@@ -9,5 +9,5 @@ export const showAlert = (type, msg) => {
   document.querySelector('body').insertAdjacentHTML('afterbegin', markUp);
   window.setTimeout(() => {
     hideAlert();
-  }, 1500);
+  }, 3000);
 };

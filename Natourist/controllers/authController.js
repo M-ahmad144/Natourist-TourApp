@@ -1,8 +1,11 @@
+
+
 const { createSendToken } = require('../services/authServices');
 const User = require('../models/userModel');
 const AppErr = require('../utils/AppErr');
 const catchAsync = require('../utils/catchAsync');
 const Email = require('../utils/email');
+
 
 // Sign Up User
 exports.signUp = catchAsync(async (req, res, next) => {
@@ -11,13 +14,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    role: req.body.role,
   });
-
-  const url = `${req.protocol}://${req.get('host')}/me`;
-
-  await new Email(newUser, url).sendWelcome();
-
   createSendToken(newUser, 201, res);
 });
 
