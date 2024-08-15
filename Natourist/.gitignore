@@ -1,11 +1,15 @@
 # Dependency directories
 node_modules/
 
-
 # Environment files
 .env
-
 config.env
+
 # Ignore all .txt files
 *.txt
 
+# Prettier configuration file
+.prettierrc
+
+# Development data folder
+dev-data/
