@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
+const compression=require('compression');
 
 const tourRouter = require('./routes/toursRoutes');
 const userRouter = require('./routes/usersRoutes');
@@ -55,6 +56,9 @@ app.use(
     },
   }),
 );
+
+// Set compression
+app.use(compression());
 
 // Parse incoming JSON requests into req.body
 app.use(express.json({ limit: '10kb' }));

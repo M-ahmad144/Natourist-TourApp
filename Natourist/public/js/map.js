@@ -40,6 +40,7 @@ export const displayMap = (locations) => {
     marker.className = 'marker';
     marker.innerHTML = '<span>📍</span>';
 
+
     new Overlay({
       position: fromLonLat([loc.coordinates[0], loc.coordinates[1]]),
       element: marker,

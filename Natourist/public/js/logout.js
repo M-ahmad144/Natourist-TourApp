@@ -9,7 +9,7 @@ export const logout = async () => {
     });
     if (res.data.status === 'success') location.reload(true);
   } catch (e) {
-    console.log(e);
+    
     showAlert('error', 'Error logging out!');
   }
 };
