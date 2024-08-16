@@ -48160,6 +48160,17 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 
 
 
+function checkScreenSize() {
+  var minScreenWidth = 768; // Set the minimum screen width for your app
+  if (window.innerWidth < minScreenWidth) {
+    alert('This website is not responsive and runs only on medium to large screens. Please access it from a device with a larger screen.');
+    document.body.innerHTML = ''; // Clear the page content
+    return; // Stop further execution
+  }
+}
+
+// Run the check when the page loads
+window.onload = checkScreenSize;
 
 // DOM Elements
 var loginForm = document.querySelector('.form--login');

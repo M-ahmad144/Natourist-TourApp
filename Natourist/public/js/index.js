@@ -5,7 +5,21 @@ import { login } from './login';
 import { logout } from './logout';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './stripe';
- import { signUp } from './signUp';
+import { signUp } from './signUp';
+
+function checkScreenSize() {
+  const minScreenWidth = 768; // Set the minimum screen width for your app
+  if (window.innerWidth < minScreenWidth) {
+    alert(
+      'This website is not responsive and runs only on medium to large screens. Please access it from a device with a larger screen.',
+    );
+    document.body.innerHTML = ''; // Clear the page content
+    return; // Stop further execution
+  }
+}
+
+// Run the check when the page loads
+window.onload = checkScreenSize;
 
 // DOM Elements
 const loginForm = document.querySelector('.form--login');
@@ -26,27 +40,27 @@ if (logOutBtn) {
   logOutBtn.addEventListener('click', logout);
 }
 
-if (signupForm) { 
-    signupForm.addEventListener('submit',  (e) => {
-      e.preventDefault();
-      // Gather form data
-      const name = document.querySelector('#name').value;
-      const email = document.querySelector('#email').value;
-      const password = document.querySelector('#password').value;
-      const passwordConfirm = document.querySelector('#passwordConfirm').value;
-      // Show loading spinner
-      const signUpBtn = document.querySelector('#signUpSubmit');
-      signUpBtn.textContent = 'Processing...';
-       signUp(name, email, password, passwordConfirm);
-        
-        // Clear fields after successful sign-up
-        document.querySelector('#name').value = '';
-        document.querySelector('#email').value = '';
-        document.querySelector('#password').value = '';
-      document.querySelector('#passwordConfirm').value = '';
-       signUpBtn.textContent = 'Sign Up';
-    });
-  }
+if (signupForm) {
+  signupForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    // Gather form data
+    const name = document.querySelector('#name').value;
+    const email = document.querySelector('#email').value;
+    const password = document.querySelector('#password').value;
+    const passwordConfirm = document.querySelector('#passwordConfirm').value;
+    // Show loading spinner
+    const signUpBtn = document.querySelector('#signUpSubmit');
+    signUpBtn.textContent = 'Processing...';
+    signUp(name, email, password, passwordConfirm);
+
+    // Clear fields after successful sign-up
+    document.querySelector('#name').value = '';
+    document.querySelector('#email').value = '';
+    document.querySelector('#password').value = '';
+    document.querySelector('#passwordConfirm').value = '';
+    signUpBtn.textContent = 'Sign Up';
+  });
+}
 
 // Handle form submission for login
 if (loginForm) {
@@ -56,12 +70,11 @@ if (loginForm) {
     const password = document.querySelector('#password').value;
 
     const signInBtn = document.querySelector('#signInSubmit');
-      signInBtn.textContent = 'Processing...';
+    signInBtn.textContent = 'Processing...';
     await login(email, password);
     signInBtn.textContent = 'Sign In';
   });
 }
-
 
 if (formUserData) {
   const photoInput = document.getElementById('photo');
@@ -85,14 +98,13 @@ if (formUserData) {
     form.append('name', document.getElementById('name').value);
     form.append('email', document.getElementById('email').value);
     form.append('photo', document.getElementById('photo').files[0]);
-    
 
     updateSettings(form, 'data');
   });
 }
 
 if (formUserPassword) {
-  formUserPassword.addEventListener('submit',  (e) => {
+  formUserPassword.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const saveBtn = document.querySelector('.btn--save-password');
@@ -104,10 +116,7 @@ if (formUserPassword) {
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password-confirm').value;
 
-     updateSettings(
-      { passwordCurrent, password, passwordConfirm },
-      'password',
-    );
+    updateSettings({ passwordCurrent, password, passwordConfirm }, 'password');
 
     // Reset button and form
     saveBtn.textContent = 'Save Password';
@@ -117,7 +126,6 @@ if (formUserPassword) {
     document.getElementById('password-confirm').value = '';
   });
 }
-
 
 if (bookBtn) {
   bookBtn.addEventListener('click', (e) => {
