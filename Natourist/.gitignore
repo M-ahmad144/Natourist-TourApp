@@ -16,8 +16,6 @@ config.env
 
 # Development data folder
 dev-data/
-
 # # Ignore Vercel configuration files
 # vercel.json
-
-# .vercel
+.vercel
