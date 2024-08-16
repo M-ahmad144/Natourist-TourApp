@@ -9,11 +9,17 @@ import { signUp } from './signUp';
 
 function checkScreenSize() {
   const minScreenWidth = 768; // Set the minimum screen width for your app
-  if (window.innerWidth < minScreenWidth) {
+
+  // Check if the device is mobile or the screen width is below the minimum
+  if (
+    window.innerWidth < minScreenWidth ||
+    /Mobi|Android/i.test(navigator.userAgent)
+  ) {
     alert(
-      'This website is not responsive and runs only on medium to large screens. Please access it from a device with a larger screen.',
+      'This website is not accessible on mobile devices or small screens. Please access it from a device with a larger screen.',
     );
     document.body.innerHTML = ''; // Clear the page content
+    document.body.style.display = 'none'; // Hide the body to prevent further interaction
     return; // Stop further execution
   }
 }
