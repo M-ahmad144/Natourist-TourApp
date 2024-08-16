@@ -8,7 +8,8 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
-const compression=require('compression');
+const compression = require('compression');
+const cors = require('cors');
 
 const tourRouter = require('./routes/toursRoutes');
 const userRouter = require('./routes/usersRoutes');
@@ -27,6 +28,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 //_________________________ Global Middlewares
+
+// Set CORS
+app.use(cors());
+
+app.options('*', cors());
 
 // Set security HTTP headers
 app.use(
