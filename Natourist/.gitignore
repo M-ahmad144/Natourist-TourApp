@@ -16,3 +16,4 @@ config.env
 
 # Development data folder
 dev-data/
+.vercel
