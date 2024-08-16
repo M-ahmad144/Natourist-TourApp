@@ -1,11 +1,8 @@
-
-
 const { createSendToken } = require('../services/authServices');
 const User = require('../models/userModel');
 const AppErr = require('../utils/AppErr');
 const catchAsync = require('../utils/catchAsync');
 const Email = require('../utils/email');
-
 
 // Sign Up User
 exports.signUp = catchAsync(async (req, res, next) => {
@@ -38,8 +35,13 @@ exports.logIn = catchAsync(async (req, res, next) => {
 // Log out User
 exports.logout = (req, res) => {
   res.cookie('jwt', 'loggedout', {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true,
+    expires: new Date(Date.now() + 10 * 1000), // Cookie expires after 10 seconds
+    httpOnly: true, // Cookie cannot be accessed by client-side scripts
+    secure:
+      process.env.NODE_ENV === 'production'
+        ? req.secure || req.headers['x-forwarded-proto'] === 'https'
+        : false, // Secure only in production
+    sameSite: 'strict', // Prevents the cookie from being sent in cross-site requests
   });
   res.status(200).json({ status: 'success' });
 };
