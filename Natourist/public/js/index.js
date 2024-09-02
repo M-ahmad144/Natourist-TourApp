@@ -18,9 +18,9 @@ function checkScreenSize() {
     alert(
       'This website is not accessible on mobile devices or small screens. Please access it from a device with a larger screen.',
     );
-    document.body.innerHTML = ''; // Clear the page content
-    document.body.style.display = 'none'; // Hide the body to prevent further interaction
-    return; // Stop further execution
+    document.body.innerHTML = '';
+    document.body.style.display = 'none';
+    return;
   }
 }
 

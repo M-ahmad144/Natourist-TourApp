@@ -48162,10 +48162,13 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 
 function checkScreenSize() {
   var minScreenWidth = 768; // Set the minimum screen width for your app
-  if (window.innerWidth < minScreenWidth) {
-    alert('This website is not responsive and runs only on medium to large screens. Please access it from a device with a larger screen.');
-    document.body.innerHTML = ''; // Clear the page content
-    return; // Stop further execution
+
+  // Check if the device is mobile or the screen width is below the minimum
+  if (window.innerWidth < minScreenWidth || /Mobi|Android/i.test(navigator.userAgent)) {
+    alert('This website is not accessible on mobile devices or small screens. Please access it from a device with a larger screen.');
+    document.body.innerHTML = '';
+    document.body.style.display = 'none';
+    return;
   }
 }
 
